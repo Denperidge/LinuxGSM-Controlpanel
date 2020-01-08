@@ -26,17 +26,19 @@ def get_serverlist():
 serverlist = get_serverlist()  # Put the tuple array in a variable
 
 
-# /admin/controlpanel/gameserver/add/
-class GameserverCreationForm(forms.ModelForm):
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
-
-    linux_username = forms.CharField(max_length=50)
-    lgsm_servername = forms.ChoiceField(choices=serverlist)
-
+# Used in /admin/controlpanel/gameserver/ & /admin/controlpanel/gameserver/add/
+class GameserverForm(forms.ModelForm):
     class Meta:
         model = Gameserver
         fields = ('linux_username', 'lgsm_servername', 'password1', 'password2')
+
+    lgsm_servername = forms.ChoiceField(choices=serverlist)
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+
+    def clean_linux_username(self):
+        # TODO check for existing user
+        return self.cleaned_data.get('linux_username')
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -52,44 +54,13 @@ class GameserverCreationForm(forms.ModelForm):
         gameserver.identifier = self.cleaned_data.get('linux_username')+"/"+self.cleaned_data.get('lgsm_servername')
         gameserver.set_password(self.cleaned_data["password1"])  # Hash password
         if commit:
-            gameserver.save()  # Save the gameserver unless commit = false
+            gameserver.save()  # Save the gameserver unless commit == false
         return gameserver
-
-
-# /admin/controlpanel/gameserver/{{id}}/change/
-class GameserverChangeForm(forms.ModelForm):
-    lgsm_servername = forms.ChoiceField(choices=serverlist)
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
-
-    class Meta:
-        model = Gameserver
-        fields = ('linux_username', 'lgsm_servername', 'password1', 'password2')
-    
-    def clean_linux_username(self):
-        # TODO check for existing user
-        return self.cleaned_data.get('linux_username')
-
-    def clean_password2(self):
-        password1 = self.cleaned_data.get("password1")
-        password2 = self.cleaned_data.get("password2")
-        if password1 and password2 and password1 != password2:
-            raise forms.ValidationError("Passwords don't match")
-        return password2
-
-    def save(self, commit=True):
-        gameserver = super().save(commit=False)
-        gameserver.identifier = self.cleaned_data.get('linux_username')+"/"+self.cleaned_data.get('lgsm_servername')
-        gameserver.set_password(self.cleaned_data["password1"])
-        if commit:
-            gameserver.save()
-        return gameserver
-
 
 # /admin/controlpanel/gameserver/
 class GameserverAdmin(BaseUserAdmin):
-    form = GameserverChangeForm
-    add_form = GameserverCreationForm
+    form = GameserverForm
+    add_form = GameserverForm
 
     list_display = ('identifier',)
     list_filter = ('identifier',)
