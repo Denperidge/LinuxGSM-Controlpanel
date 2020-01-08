@@ -5,10 +5,8 @@ lgsmcp="$(dirname "${script}")/lgsmcp"
 
 read -p "This will wipe the entire db, including migrations and caching. If you're certain, type 'yes': " certain
 
-
 if [ "${certain}" != "yes" ]; then
     echo "Wipe cancelled!"
-    sleep 2
     exit 0
 fi
 
@@ -21,14 +19,9 @@ rm "${lgsmcp}/db.sqlite3*"
 
 echo "Wiped cache, migrations and db!"
 
-sleep 1
 
-echo "Creating new superuser..."
-
-python "${lgsmcp}/manage.py" migrate --run-syncdb
-python "${lgsmcp}/manage.py" createsuperuser --linux_username= --lgsm_servername=
+${lgsmcp}/../install.sh
 
 echo "Wipe succesful!"
 
-sleep 5
 exit 0
