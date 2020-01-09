@@ -1,5 +1,6 @@
 import Pyro4
 import os
+import pwd
 import subprocess
 
 from dotenv import load_dotenv
@@ -7,17 +8,12 @@ load_dotenv()
 
 os.environ["PYRO_HMAC_KEY"] = os.getenv("DAEMON_HMAC")
 
-subprocess.Popen(["py", "-3", "-m", "Pyro4.naming"])
-
-print(os.getenv("DAEMON_HMAC"))
-
-currentDir = os.path.abspath(__file__).replace(os.path.basename(__file__), "")
-
+subprocess.Popen(["python3", "-m", "Pyro4.naming"])
 
 @Pyro4.expose
 class LgsmcpDaemon(object):
-    def connect(self, name):
-        return 'Connected to {0}'.format(name)
+    def lgsmCommand(self, linuxUsername, serverUsername, command):
+        return 'Connected to {0} {1} {2}'.format(linuxUsername, serverUsername, command)
 
 daemon = Pyro4.Daemon()
 daemon._pyroHmacKey = os.getenv("DAEMON_HMAC")

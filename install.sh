@@ -4,7 +4,8 @@ script=$(readlink -f $0)
 lgsmcp="$(dirname "${script}")/lgsmcp"
 
 echo "Installing requirements..."
-py -3 -m pip install -r requirements.txt
+sudo apt install python3-pip
+pip3 install -r requirements.txt
 
 echo "Generating .env file..."
 echo "To secure the connection between Django and the Daemon, a hmac key needs to be applied."
@@ -17,11 +18,11 @@ echo $hmac >> .env
 
 echo "Generating database..."
 
-py -3 "${lgsmcp}/manage.py" migrate --run-syncdb
+python3 "${lgsmcp}/manage.py" migrate --run-syncdb
 
 echo "Creating new superuser..."
 
 read -p "Identifier: " identifier
 read -s -p "Password: " password
 
-py -3 "${lgsmcp}/manage.py" createsuperuser --identifier=${identifier} --linux_username= --lgsm_servername= --password=${password}
+python3 "${lgsmcp}/manage.py" createsuperuser --identifier=${identifier} --linux_username= --lgsm_servername= --password=${password}
