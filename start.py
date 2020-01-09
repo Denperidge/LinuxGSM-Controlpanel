@@ -10,4 +10,4 @@ try:
     daemon.communicate()
 except:
     server.kill()
-    system("sudo kill " + daemon.pid)
+    system("sudo kill " + str(daemon.pid))
