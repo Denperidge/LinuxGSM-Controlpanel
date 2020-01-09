@@ -4,17 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth import authenticate, login, logout
 
-import os
-
-import Pyro4
-from dotenv import load_dotenv
-load_dotenv()
-
-daemon = Pyro4.Proxy('PYRONAME:lgsmcp.daemon')
-daemon._pyroHmacKey = os.getenv("DAEMON_HMAC")
-
-def getServer(command):
-    return daemon.connect("details")
+from .daemon import getServer
 
 def loginToGameserver(request):
     identifier = request.POST.get('username')
@@ -55,5 +45,5 @@ def index(request):
     if request.user.is_staff:
         return HttpResponseRedirect('/admin/')
     
-    return HttpResponse(getServer("details")) #HttpResponse("Hello")
+    return HttpResponse(getServer("details"))
 
