@@ -18,10 +18,10 @@ rm "${lgsmcp}/db.sqlite3"
 rm "${lgsmcp}/db.sqlite3*"
 
 echo "Wiped cache, migrations and db!"
-
-
-${lgsmcp}/../install.sh
-
 echo "Wipe succesful!"
+
+echo "Reinstalling..."
+${lgsmcp}/../install.sh
+echo "Reinstalled!"
 
 exit 0
