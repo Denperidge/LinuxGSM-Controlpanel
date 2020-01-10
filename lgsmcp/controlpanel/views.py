@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth import authenticate, login, logout
 
-from .daemon import daemonGet
+from .daemon import daemonGetServerInfo
 
 def loginToGameserver(request):
     identifier = request.POST.get('username')
@@ -45,5 +45,5 @@ def index(request):
     if request.user.is_staff:
         return HttpResponseRedirect('/admin/')
     
-    return HttpResponse(daemonGet(request.user, "details"))
+    return HttpResponse(daemonGetServerInfo(request.user, "start"))
 
