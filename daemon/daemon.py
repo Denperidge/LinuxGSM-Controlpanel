@@ -22,13 +22,15 @@ def runAsUser(username):
         
     return setUser
 
+# General purpose function: run command as user
+# linuxUsername should be str, command list
 @Pyro4.expose
 class LgsmcpDaemon(object):
-    def lgsmCommand(self, linuxUsername, serverName, command):
+    def runAsUser(self, linuxUsername, command):
         output = "Error"
 
         try:  # Succesful reply returns bytes, and can thus be serialized to string
-            output = subprocess.check_output(["/home/" + linuxUsername + "/" + serverName, command], preexec_fn=runAsUser(linuxUsername))
+            output = subprocess.check_output(command, preexec_fn=runAsUser(linuxUsername))
         except subprocess.CalledProcessError as e:
             # Unsuccesful reply returns CalledProcessError, which throws a CalledProcessError
             output = "[" + str(e.returncode) + "] " + str(e.output)
