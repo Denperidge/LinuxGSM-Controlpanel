@@ -130,3 +130,5 @@ AUTH_USER_MODEL = "controlpanel.GameServer"
 
 # Override default login url
 LOGIN_URL= '/login/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
