@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth import authenticate, login, logout
 
+import json
+
 from .daemon import lgsmCommand
 
 def loginToGameserver(request):
@@ -45,5 +47,14 @@ def index(request):
     if request.user.is_staff:
         return HttpResponseRedirect('/admin/')
     
-    return HttpResponse(lgsmCommand(request.user, "start"))
+    output = lgsmCommand(request.user, "start")
+
+    # TODO Parse list
+    # To parse list string, replace single quotes with double & do a json loads
+    # If this method is used, improve replace to not replace *all* single quotes
+    # output = json.loads(output)
+    
+    html = output
+    
+    return HttpResponse(html)
 

@@ -3,9 +3,12 @@ import os
 import sys
 import pwd
 import subprocess
+import re
 
 from dotenv import load_dotenv
 load_dotenv()
+
+regexCleanConsoleOutput = r"\\.*?]"
 
 os.environ["PYRO_HMAC_KEY"] = os.getenv("DAEMON_HMAC")
 
@@ -22,6 +25,22 @@ def runAsUser(username):
         
     return setUser
 
+def cleanConsoleOutput(outputBytes):
+    # Convert bytes to string
+    rawOutput = str(outputBytes).split("\\n")
+    output = []
+    for line in rawOutput:
+        # If a singular character gets through (or somehow an empty line),
+        # check if alphanumeric. If not, don't pass through. 
+        if (len(line)) < 2 and not line.isalnum():
+            continue
+        
+        cleaned_line = re.sub(regexCleanConsoleOutput, "", line, 0).replace("b'", "").strip()
+        
+        output.append(cleaned_line)
+
+    return output
+
 # General purpose function: run command as user
 # linuxUsername should be str, command list
 @Pyro4.expose
@@ -29,18 +48,18 @@ class LgsmcpDaemon(object):
     def runAsUser(self, linuxUsername, command):
         output = "Error"
 
-        try:  # Succesful reply returns bytes, and can thus be serialized to string
+        try:  # Succesful reply returns bytes, and can thus be serialized into a str and to a list
             output = subprocess.check_output(command, preexec_fn=runAsUser(linuxUsername))
+            output = cleanConsoleOutput(output)
+            
         except subprocess.CalledProcessError as e:
-            # Unsuccesful reply returns CalledProcessError, which throws a CalledProcessError
-            output = "[" + str(e.returncode) + "] " + str(e.output)
-        
+            # Unsuccesful reply returns subprocess.CalledProcessError eventargs, which need some extra steps
+            output = ["(" + str(e.returncode) + ")"] + cleanConsoleOutput(e.output)
+
+        # Daemon needs to send str
         output = str(output)
 
-        print("Returning: " + output)
         return output
-
-        
 
 daemon = Pyro4.Daemon()
 daemon._pyroHmacKey = os.getenv("DAEMON_HMAC")
