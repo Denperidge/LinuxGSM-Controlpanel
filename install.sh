@@ -18,7 +18,7 @@ echo "Generating database..."
 python3 "${lgsmcp}/manage.py" migrate --run-syncdb
 
 echo "Creating new superuser..."
-
+echo "The superuser is the login used to add servers from /admin"
 read -p "Identifier: " identifier
 read -s -p "Password: " password
 
