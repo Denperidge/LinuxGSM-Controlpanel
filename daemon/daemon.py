@@ -28,20 +28,33 @@ def runAsUser(username):
 def cleanConsoleOutput(outputBytes):
     # Convert bytes to string
     rawOutput = str(outputBytes).split("\\n")
-    output = []
+    parsedOutput = []
     for line in rawOutput:
         # If a singular character gets through (or somehow an empty line),
         # check if alphanumeric. If not, don't pass through. 
         if (len(line)) < 2 and not line.isalnum():
             continue
 
-        cleaned_line = re.sub(regexCleanConsoleOutput, "", line, 0).replace("b'", "").strip()
-                    
-        # LGSM sends a string of what it's doing to the console, clears, and then the same thing with the result.
-        # This causes check_output to capture it like this: Starting nmrihserver: Check IP Starting nmrihserver: Check IP: x.x.x.x
-        # TODO: fix that
+        cleanedLine = re.sub(regexCleanConsoleOutput, "", line, 0).replace("b'", "").strip()
+        parsedOutput.append(cleanedLine)
+    
+    # LGSM sends a string of what it's doing to the console, clears, and then the same thing with the result.
+    # This causes check_output to capture it like this: Starting nmrihserver: Check IP Starting nmrihserver: Check IP: x.x.x.x
 
-        output.append(cleaned_line)
+    output = []
+    for line in parsedOutput:
+        unparsedWords = line.split(" ")
+        unparsedWords.reverse()
+        # Scroll through the words in reverse, seeing that the latest text is the newest and thus preferable to keep
+        words = []
+        for word in unparsedWords:
+            # If word not in words yet
+            if word not in words:
+                # Insert in reverse
+                words.insert(0, word)
+        
+        parsedWords = " ".join(words)
+        output.append(parsedWords)
 
     return output
 
