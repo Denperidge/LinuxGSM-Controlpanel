@@ -1,0 +1,81 @@
+<!doctype html>
+<html class="h-100" lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>LGSM ControlPanel</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+    crossorigin="anonymous"></script>
+
+</head>
+
+<body class="h-100">
+  <div class="container h-100 d-flex align-items-center justify-content-center">
+    <div class="d-flex flex-column">
+      <button class="btn btn-primary mb-3" id="start">Start server</button>
+      <button class="btn btn-primary mb-3" id="stop">Stop server</button class="btn btn-primary">
+      <button class="btn btn-primary mb-3" id="restart">Restart server</button class="btn btn-primary">
+
+      <button class="btn btn-primary mt-5" id="logout">Logout</button>
+    </div>
+
+    <div id="lgsmOutput" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">LGSM Output</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <span id="modalText"></span>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var modalText = $("#modalText");
+    function lgsm(e) {
+      $("#lgsmOutput").modal()
+      modalText.text("Loading...");
+      $.get("/lgsm/?command=" + e.target.id, function(raw) {
+        var data = JSON.parse(raw);
+        
+        for (var i = 0; i < data.length; i++) {
+          modalText.append($("<p>").text(data[i]))
+        }
+      });
+    }
+
+    function logout() {
+      window.location.href = "/logout/";
+    }
+
+    $(document).ready(function () {
+      $("#start").click(lgsm);
+      $("#stop").click(lgsm);
+      $("#restart").click(lgsm);
+
+      $("#logout").click(logout);
+    });
+  </script>
+</body>
+
+</html>

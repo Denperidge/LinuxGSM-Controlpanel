@@ -59,7 +59,9 @@ ROOT_URLCONF = 'lgsmcp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'controlpanel', 'html'),
+            ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

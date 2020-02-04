@@ -47,14 +47,19 @@ def index(request):
     if request.user.is_staff:
         return HttpResponseRedirect('/admin/')
     
-    output = lgsmCommand(request.user, "start")
+    return render(request, 'index.html')
 
-    # TODO Parse list
-    # To parse list string, replace single quotes with double & do a json loads
-    # If this method is used, improve replace to not replace *all* single quotes
-    # output = json.loads(output)
+@login_required
+def lgsm(request):
+    if request.user.is_staff:
+        return HttpResponseRedirect('/admin/')
     
-    html = output
+    print(request.GET["command"])
     
-    return HttpResponse(html)
+    output = lgsmCommand(request.user, request.GET["command"])
+
+    # Return JSON, has to be in double quotes to work
+    output = output.replace("'", '"')
+
+    return HttpResponse(output)
 

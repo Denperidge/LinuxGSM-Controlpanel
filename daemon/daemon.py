@@ -34,9 +34,13 @@ def cleanConsoleOutput(outputBytes):
         # check if alphanumeric. If not, don't pass through. 
         if (len(line)) < 2 and not line.isalnum():
             continue
-        
+
         cleaned_line = re.sub(regexCleanConsoleOutput, "", line, 0).replace("b'", "").strip()
-        
+                    
+        # LGSM sends a string of what it's doing to the console, clears, and then the same thing with the result.
+        # This causes check_output to capture it like this: Starting nmrihserver: Check IP Starting nmrihserver: Check IP: x.x.x.x
+        # TODO: fix that
+
         output.append(cleaned_line)
 
     return output
