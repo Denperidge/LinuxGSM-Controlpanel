@@ -54,12 +54,10 @@ def lgsm(request):
     if request.user.is_staff:
         return HttpResponseRedirect('/admin/')
     
-    print(request.GET["command"])
-    
     output = lgsmCommand(request.user, request.GET["command"])
 
     # Return JSON, has to be in double quotes to work
-    output = output.replace("'", '"')
+    output = output.replace('"', '\\"').replace("'", '"')
 
     return HttpResponse(output)
 
