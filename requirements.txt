@@ -1,4 +1,4 @@
-Django==3.0.3
+Django==3.0.7
 requests==2.22.0
 Pyro4==4.77
 python-dotenv==0.10.3
